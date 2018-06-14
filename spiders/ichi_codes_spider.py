@@ -2,6 +2,7 @@ import scrapy
 import json
 import couchdb
 import time
+import csv
 
 class ichi_spider(scrapy.Spider):
 
@@ -32,7 +33,25 @@ class ichi_spider(scrapy.Spider):
 
     def parse(self, response):
         data = json.loads(response.text)
-    	# filename = 'codes.json'
-        self.db.save(data['data']['content'])
-    	# with open(filename, 'ab') as f:
-    	# 	f.write(json.dumps(data['data']['content']))
+    	content = data['data']['content']
+
+        codes_json = 'codes.json'
+        # self.db.save(content)
+    	with open(codes_json, 'ab') as f:
+    	 	f.write(json.dumps(content))
+
+        # save json 
+
+        codes_csv = 'codes.csv'
+        # csf_writer.writerow(["Code","Target","Action","Means","Descriptor","Inclusion Terms"])
+        with open(codes_csv, 'ab') as f:
+            csf_writer = csv.writer(f)
+            csf_writer.writerow([content["code"], 
+                content["target_code"] + "-" + content["target_title"], 
+                content["action_code"] + "-" + content["action_title"], 
+                content["means_code"] + "-" + content["means_title"],
+                content["descriptor"],
+                content["inclusion_terms"],
+                content["includes_notes"],
+                content["excludes_notes"]])
+            
